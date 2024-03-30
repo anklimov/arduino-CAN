@@ -168,8 +168,10 @@ int ESP32SJA1000Class::endPacket()
     return 0;
   }
 
+  uint32_t tmr1 = millis();  
   // wait for TX buffer to free
   while ((readRegister(REG_SR) & 0x04) != 0x04) {
+      if (millis() - tmr1 >= CAN_MAXTRANSMIT_MS) return 0;
     yield();
   }
 
@@ -202,7 +204,8 @@ int ESP32SJA1000Class::endPacket()
     // transmit request
     modifyRegister(REG_CMR, 0x1f, 0x01);
   }
-
+  
+    tmr1 = millis();  
   // wait for TX complete
   while ((readRegister(REG_SR) & 0x08) != 0x08) {
     if (readRegister(REG_ECC) == 0xd9) {
@@ -210,6 +213,7 @@ int ESP32SJA1000Class::endPacket()
       return 0;
     }
     yield();
+      if (millis() - tmr1 >= CAN_MAXTRANSMIT_MS) return 0;
   }
 
   return 1;

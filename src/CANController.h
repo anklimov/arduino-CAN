@@ -6,6 +6,10 @@
 
 #include <Arduino.h>
 
+#ifndef CAN_MAXTRANSMIT_MS
+#define CAN_MAXTRANSMIT_MS 100
+#endif
+
 class CANControllerClass : public Stream {
 
 public:
